@@ -33,14 +33,9 @@ def normalizer(dataset):
 v4_train_captions_collection = pd.read_excel("Captions collection/v4_train_captions_collection.xlsx")
 v5_train_captions_collection = normalizer(v4_train_captions_collection)
 
-# Normalization of the time series within the validation dataset
-v4_val_captions_collection = pd.read_excel("Captions collection/v4_val_captions_collection.xlsx")
-v5_val_captions_collection = normalizer(v4_val_captions_collection)
-
 # Normalization of the time series within the test dataset
 v4_test_captions_collection = pd.read_excel("Captions collection/v4_test_captions_collection.xlsx")
 v5_test_captions_collection = normalizer(v4_test_captions_collection)
 
 v5_train_captions_collection.to_excel("Captions collection/v5_train_captions_collection.xlsx") 
-v5_val_captions_collection.to_excel("Captions collection/v5_val_captions_collection.xlsx") 
 v5_test_captions_collection.to_excel("Captions collection/v5_test_captions_collection.xlsx") 

@@ -56,14 +56,9 @@ tkn_col_dict = {"Year" : "TKN_Year", "Geo" : "TKN_Geo", "UOM" : "TKN_UOM"}
 v3_train_captions_collection = pd.read_excel("Captions collection/v3_train_captions_collection.xlsx")
 v4_train_captions_collection = tokenizer(v3_train_captions_collection)
 
-# Tokenization of the validation dataset
-v3_val_captions_collection = pd.read_excel("Captions collection/v3_val_captions_collection.xlsx")
-v4_val_captions_collection = tokenizer(v3_val_captions_collection)
-
 # Tokenization of the test dataset
 v3_test_captions_collection = pd.read_excel("Captions collection/v3_test_captions_collection.xlsx")
 v4_test_captions_collection = tokenizer(v3_test_captions_collection)
 
 v4_train_captions_collection.to_excel("Captions collection/v4_train_captions_collection.xlsx") 
-v4_val_captions_collection.to_excel("Captions collection/v4_val_captions_collection.xlsx") 
 v4_test_captions_collection.to_excel("Captions collection/v4_test_captions_collection.xlsx") 
