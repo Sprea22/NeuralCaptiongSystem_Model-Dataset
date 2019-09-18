@@ -27,6 +27,10 @@ model_4096 = Model(input=model_1000.input, output=model_1000.get_layer('fc2').ou
 features_4096 = model_4096.predict(x)
 features_4096 = features_4096.reshape((4096,1))
 
+# Extracted features
+# features_1000
+# features_4096
+
 print(features_1000.flatten().shape)
 print(features_4096.flatten().shape)
 
