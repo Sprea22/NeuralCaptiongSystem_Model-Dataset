@@ -15,7 +15,7 @@ def format_structure(dataset):
             input_seq = input_seq + str(temp_df["UOM"][index]) + "___"
             input_seq = input_seq + str(temp_df["min_time_series"][index]) + "___"
             input_seq = input_seq + str(temp_df["max_time_series"][index]) + "___"
-            output_seq =  str(temp_df["caption"][index])
+            output_seq =  str(temp_df["tokenized_caption"][index])
             time_series_values = row.iloc[8:20].values
             for value in time_series_values:
                 input_seq = input_seq + str(value) + " "

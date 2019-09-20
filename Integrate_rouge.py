@@ -1,3 +1,4 @@
+import pandas as pd
 import rouge
 
 def prepare_results(metric, p, r, f):
@@ -39,18 +40,57 @@ def rouge_evaluation(all_hypothesis, all_references):
         print()
 
 
-#all_hypothesis = [hypothesis_1, hypothesis2, hypothesis3]
-#all_references = [[reference_11, reference_12], [reference_21, reference_22], [reference_31, reference_32]]
+### ### ### ### ####
+# MODEL INFERENCES #
+### ### ### ### ####
 
-### hypothesis and references examples
-hypothesis_1 = "ciao\n"
-references_1 = ["ciao \n", "prova \n"]
+dataset = pd.read_excel("/content/drive/My Drive/Current Works/UBC Research Period/Training Folder/v5_train_captions_collection.xlsx")
 
-hypothesis_2 = "Strongly fluactuating over the year.\n"
-references_2 = ["The values are strongly fluctuating over the year. \n", "There are several peaks and dips over the year.\n"]
-###
 
-all_hypothesis = [hypothesis_1, hypothesis_2]
-all_references = [references_1, references_2]
+orig_captions = []
+orig_tknzed_captions = []
 
-rouge_evaluation(all_hypothesis, all_references)
+output_captions = []
+output_tknzed_captions = []
+
+seq_examples = [1, 100, 200, 300, 400]
+
+for idx, seq_index in enumerate(seq_examples):
+    input_seq = encoder_input_data[seq_index: seq_index + 1]
+    decoded_sentence = decode_sequence(input_seq)
+    current_id = dataset.iloc[seq_index]["ID_Series"]
+    current_df = dataset[dataset["ID_Series"] == current_id]
+
+    # Detokenization process
+    dtkn_vocabulary = {}
+    dtkn_vocabulary["tkn_year"] = current_df["Year"][0] 
+    dtkn_vocabulary["tkn_geo"] = current_df["Geo"][0] 
+    dtkn_vocabulary["tkn_about"] = current_df["About"][0] 
+    dtkn_vocabulary["tkn_uom"] = current_df["UOM"][0] 
+
+    decoded_dtknzd_sentence = decoded_sentence
+    for tkn in dtkn_vocabulary:
+         decoded_dtknzd_sentence = decoded_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
+
+    print("Input values sequence: ", input_seq)
+    print("Output tokenized sequence: ", decoded_sentence)
+    print("Output detokenized sequence: ", decoded_dtknzd_sentence)
+    
+    output_captions.append(decoded_dtknzd_sentence)
+    output_tknzed_captions.append(decoded_sentence)
+    
+    related_caption = current_df["caption"]#check out the values types.. it has to be a list of strings
+    orig_tknzed_captions = current_df["tokenized_caption"] #check out the values types.. it has to be a list of strings
+
+### ### ### ### ####
+# MODEL EVALUATION #
+### ### ### ### ####
+
+# Rouge metric between list of decoded sentences and orig_tknzed_captions
+rouge_evaluation(output_tknzed_captions, orig_tknzed_captions)
+
+# Rouge metric between list of decoded detokenized sentences and orig_captions
+rouge_evaluation(output_captions, orig_captions)
+
+
+          

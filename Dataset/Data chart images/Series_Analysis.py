@@ -5,7 +5,7 @@ import re
 import matplotlib.pyplot as plt
 
 # Importing the data
-df_dir = './Final_Dataset.xlsx'
+df_dir = './data_charts_dataset.xlsx'
 df = pd.read_excel(df_dir)
 
 list_of_series = df.ID_Series.unique()
@@ -35,7 +35,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 cax = ax.matshow(corr_matrix, interpolation='nearest')
 fig.colorbar(cax)  
-#plt.show()
+plt.show()
 
 # Display the correlation matrix between the time series
 # Highlighting just the time series with the highest correlation value
@@ -45,7 +45,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 cax = ax.matshow(corr_matrix, interpolation='nearest')
 fig.colorbar(cax)
-#plt.show()
+plt.show()
 
 lab_cont = 0
 high_correlation_counter = 0

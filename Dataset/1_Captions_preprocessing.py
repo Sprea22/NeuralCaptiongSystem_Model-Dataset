@@ -51,11 +51,13 @@ print(" \n The captions have been correctly splitted into subsentences!")
 ######################################
 
 for idx, row in v1_captions_collection.iterrows():
+    current_caption = row["caption"]
+    new_caption = current_caption
     # Check if there are sentences which contain special chars (e.g. \n)
     special_chars_list = ["\n, \t"]
     for special_char in special_chars_list:
-        if(special_char in row["caption"]):
-
+        if(special_char in current_caption):
+            new_caption = new_caption.replace(special_char, "")
     # Check if each sentence is ending with a period char.
     if(row["caption"][-1] != "." ):
         row["caption"] = row["caption"] + "."       
@@ -63,6 +65,15 @@ for idx, row in v1_captions_collection.iterrows():
     # Check if there are sentences shorter than 15 chars or none value
     if(len(row["caption"]) < 15 or row["caption"] is None):
         v1_captions_collection = v1_captions_collection.drop(idx)
-
+    splitted_caption = current_caption.split(" ")
+    for word in splitted_caption:
+        try:
+            val_first = int(word[0])
+            val_last = int(word[-1])
+            if(',' in word):
+                new_word = word.replace(',', '.')
+                new_caption = new_caption.replace(word, new_word)
+        except:
+            pass
 v1_captions_collection.set_index('ID', inplace=True)
 v1_captions_collection.to_excel("Captions collection/v1_captions_collection.xlsx") 
