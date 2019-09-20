@@ -2,7 +2,26 @@ import numpy as np
 import pandas as pd
 import random
 import rouge
-  
+
+def denormalization(input_sequence, input_min, input_max):
+    print(input_sequence)
+    for word in input_sequence.split(" "):
+            try:
+                if(word[-1] == "."):
+                    val = float(word[:-1])
+                else:
+                    # Check if the word is a float
+                    val = float(word)
+                # Normalize the value
+                #N = val - input_min
+                #D = input_max - input_min
+                val_to_substitute = (val * (input_max - input_min)) + input_min
+                # Substitute the normalized value with the original value in the tokenized caption
+                new_caption = new_caption.replace(str(val), str(round(val_to_substitute, 2)))
+            except:
+                pass
+    return input_sequence
+                  
 def prepare_results(metric, p, r, f):
     return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
 
@@ -74,7 +93,7 @@ output_tknzed_captions = []
 IDs = dataset["ID_Series"].values
 
 for idx, seq_index in enumerate(IDs):
-    current_id = dataset.iloc[seq_index]["ID_Series"]
+    current_id = dataset.iloc[idx]["ID_Series"]
     current_df = dataset[dataset["ID_Series"] == current_id]
 
     # Detokenization process
@@ -91,10 +110,11 @@ for idx, seq_index in enumerate(IDs):
 
     decoded_sentence, max_corr_id, max_corr_val = similarity_model(input_sequence, dataset_train)
 
-    decoded_dtknzd_sentence = decoded_sentence
+    decoded_dtknzd_sentence = denormalization(decoded_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
+
     for tkn in dtkn_vocabulary:
          decoded_dtknzd_sentence = decoded_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
-         
+
     '''
     print('-- #', idx, '------------------------------------------------------------------------------------------------')
     print("Correlation idx: ", max_corr_id, " with: ", max_corr_val)
