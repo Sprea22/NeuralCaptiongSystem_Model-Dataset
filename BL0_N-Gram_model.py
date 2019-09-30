@@ -9,6 +9,31 @@ import bs4 as bs
 import urllib.request
 import re
 
+
+def print_results(idx, input_sequence, output_sentence):
+    print('-- #', idx, '------------------------------------------------------------------------------------------------')
+    print("Input values sequence: ", input_sequence)
+    print("Output tokenized sequence: ", output_sentence)
+    print('\n')
+
+def validation_set(dataset, numb):
+    numb_list = list(dataset["ID_Series"].values)
+    choosen_list = []
+
+    for n in range(numb):
+        r_num = random.choice(numb_list)
+        choosen_list.append(r_num)
+        numb_list.remove(r_num) 
+    return choosen_list
+
+def set_vocabulary(current_df):
+    dtkn_vocabulary = {}
+    dtkn_vocabulary["TKN_Year"] = str(current_df["Year"].values[0])
+    dtkn_vocabulary["TKN_Geo"] = current_df["Geo"].values[0] 
+    dtkn_vocabulary["TKN_About"] = current_df["About"].values[0] 
+    dtkn_vocabulary["TKN_UOM"] = current_df["UOM"].values[0] 
+    return dtkn_vocabulary
+
 def denormalization(input_sequence, input_min, input_max):
     input_sequence = input_sequence[:-1]
     new_caption = input_sequence
@@ -24,7 +49,6 @@ def denormalization(input_sequence, input_min, input_max):
                 #D = input_max - input_min
                 val_to_substitute = (val/100 * (input_max - input_min)) + input_min
                 # Substitute the normalized value with the original value in the tokenized caption
-                print(val_to_substitute)
                 new_caption = new_caption.replace(str(val), str(round(val_to_substitute, 2)))
             except:
                 pass
@@ -91,13 +115,16 @@ def ngram_model(n_grams, article_text, output_sentence_len):
         seq_words = nltk.word_tokenize(output)
         curr_sequence = ' '.join(seq_words[len(seq_words)-words:len(seq_words)])
 
-    print(output)
     sent_output = output.split(".")[:-1]
     final_output = ''
     for sent in sent_output:
         final_output = final_output + sent + " . "
 
     return final_output
+
+##################
+# Initialization # 
+##################
 
 #dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
 dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
@@ -106,71 +133,71 @@ article_text = ''
 for caption in dataset["tokenized_caption"]:
     article_text += caption
 
+orig_sentences, orig_captions = [], []
+output_sentences, output_captions = [], []
 
+# Selecting a list of 10 random time series to evaluate through rouge 
+choosen_list = validation_set(dataset, 10)
 
-orig_captions = []
-orig_tknzed_captions = []
-
-output_captions = []
-output_tknzed_captions = []
-
-#IDs = dataset["ID_Series"].values
-numb_list = list(dataset["ID_Series"].values)
-choosen_list = []
-# Selecting a list of 106 caption idxs for the test split
-for n in range(10):
-    r_num = random.choice(numb_list)
-    choosen_list.append(r_num)
-    numb_list.remove(r_num) 
-
+###################################
+# Generating the output sentences #
+###################################
 for idx, seq_index in enumerate(choosen_list):
     current_id = dataset.iloc[idx]["ID_Series"]
     current_df = dataset[dataset["ID_Series"] == current_id]
-
-    # Detokenization process
-    dtkn_vocabulary = {}
-    dtkn_vocabulary["TKN_Year"] = str(current_df["Year"].values[0])
-    dtkn_vocabulary["TKN_Geo"] = current_df["Geo"].values[0] 
-    dtkn_vocabulary["TKN_About"] = current_df["About"].values[0] 
-    dtkn_vocabulary["TKN_UOM"] = current_df["UOM"].values[0] 
-    
-    #temp_dataset = dataset[dataset["ID_Series"] == seq_index]
-    temp_dataset = dataset[dataset["ID_Series"] == seq_index]
-    temp_dataset = temp_dataset.reset_index(drop=True)
-    temp_series = temp_dataset.iloc[0, 8:20].values.tolist()
-    input_sequence = temp_series
-    decoded_sentence = ngram_model(2, article_text, 15)
-
-    decoded_dtknzd_sentence = denormalization(decoded_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
-
+    # Setting the vocabulary for the current time series
+    dtkn_vocabulary = set_vocabulary(current_df)
+    # Generating the output sentence
+    output_sentence = ngram_model(2, article_text, 15)
+    # Denormalize the output sentence
+    output_dtknzd_sentence = denormalization(output_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
     for tkn in dtkn_vocabulary:
-         decoded_dtknzd_sentence = decoded_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
+         output_dtknzd_sentence = output_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
+    # Append the orig and the output sentences, ready for the evaluation     
+    output_sentences.append(output_dtknzd_sentence)
+    orig_sentences.append(list(current_df["caption"].values))
+    #print_results(idx, input_sequence, output_sentence)
 
-    '''
-    print('-- #', idx, '------------------------------------------------------------------------------------------------')
-    print("Time series data: ", dtkn_vocabulary)
-    print("Input values sequence: ", input_sequence)
-    print("Output tokenized sequence: ", decoded_sentence)
-    print("Output detokenized sequence: ", decoded_dtknzd_sentence)
-    print('\n')
-    '''
-    
-    output_captions.append(decoded_dtknzd_sentence)
-    output_tknzed_captions.append(decoded_sentence)
-    
-    orig_captions.append(current_df["caption"].values[0])
-    orig_tknzed_captions.append(list(current_df["tokenized_caption"].values))
+##################################
+# Generating the output captions #
+##################################
+for idx, seq_index in enumerate(choosen_list):
+    current_id = dataset.iloc[idx]["ID_Series"]
+    current_df = dataset[dataset["ID_Series"] == current_id]
+    current_captions_idxs = np.unique(current_df["ID_Caption"])
+    current_captions = []
+    t_caption = ""
+    # Merging sentences back to the original caption
+    for temp_id_caption in current_captions_idxs:
+        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["caption"].values:
+            t_caption = t_caption + " " + sentence
+        current_captions.append(t_caption)
+    # Setting the vocabulary for the current time series
+    dtkn_vocabulary = set_vocabulary(current_df)
+    # Generating the output sentence
+    output_caption = ngram_model(2, article_text, 53)
+    # Denormalize the output sentence
+    output_dtknzd_caption = denormalization(output_caption, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
+    for tkn in dtkn_vocabulary:
+         output_dtknzd_caption = output_dtknzd_caption.replace(tkn, dtkn_vocabulary[tkn])
+    # Append the orig and the output sentences, ready for the evaluation     
+    output_captions.append(output_dtknzd_caption)
+    orig_captions.append(current_captions)
+    #print_results(idx, input_sequence, output_sentence)
     
 ### ### ### ### ####
 # MODEL EVALUATION #
 ### ### ### ### ####
 
 print("\n############################")
-print("##### MODEL EVALUATION #####")
+print("### SENTENCE EVALUATION ####")
 print("############################\n")
 
-# Rouge metric between list of decoded sentences and orig_tknzed_captions
-rouge_evaluation(output_tknzed_captions, orig_tknzed_captions)
+# Rouge metric between list of output detokenized sentences and orig_sentences
+rouge_evaluation(output_sentences, orig_sentences)
 
-# Rouge metric between list of decoded detokenized sentences and orig_captions
+print("\n############################")
+print("#### CAPTION EVALUATION ####")
+print("############################\n")
+# Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)
