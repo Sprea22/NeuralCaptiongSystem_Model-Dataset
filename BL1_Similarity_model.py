@@ -185,9 +185,9 @@ for idx, seq_index in enumerate(choosen_list):
 ### ### ### ### ####
 
 print("\n############################")
-print("##### MODEL EVALUATION #####")
+print("##### SENTENCE EVALUATION #####")
 print("############################\n")
-# Rouge metric between list of decoded detokenized sentences and orig_captions
+# Rouge metric between list of output detokenized sentences and original sentences
 rouge_evaluation(output_captions, orig_captions)
 
 print("\n############################")

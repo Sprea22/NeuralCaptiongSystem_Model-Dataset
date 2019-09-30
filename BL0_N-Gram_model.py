@@ -1,14 +1,12 @@
-import nltk
 import numpy as np
-import random
-import string
-import rouge
 import pandas as pd
-
+import random
+import rouge
+import nltk
+import string
 import bs4 as bs
 import urllib.request
 import re
-
 
 def print_results(idx, input_sequence, output_sentence):
     print('-- #', idx, '------------------------------------------------------------------------------------------------')
@@ -192,8 +190,7 @@ for idx, seq_index in enumerate(choosen_list):
 print("\n############################")
 print("### SENTENCE EVALUATION ####")
 print("############################\n")
-
-# Rouge metric between list of output detokenized sentences and orig_sentences
+# Rouge metric between list of output detokenized sentences and original sentences
 rouge_evaluation(output_sentences, orig_sentences)
 
 print("\n############################")
