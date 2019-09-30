@@ -8,7 +8,7 @@ def time_series_values_normalizer(input_series):
 
     for num in input_series:
         new_num = (num - min_input_series)/(max_input_series - min_input_series)
-        normalized_input_series.append(round(new_num, 2))
+        normalized_input_series.append(round(new_num, 2)*100)
 
     return normalized_input_series, min_input_series, max_input_series
 
@@ -17,7 +17,7 @@ def normalizer(dataset):
     dataset["min_time_series"] = ""
 
     for row_index, row in dataset.iterrows():
-        normalized_time_series, min_input_series, max_input_series = time_series_values_normalizer(row.iloc[8:20].values)
+        normalized_time_series, min_input_series, max_input_series = time_series_values_normalizer(row.iloc[9:21].values)
         for col_index, value in enumerate(normalized_time_series):
             dataset.iloc[row_index, 8 + col_index] = value
         dataset.iloc[row_index, dataset.columns.get_loc("min_time_series")] = min_input_series
@@ -51,12 +51,12 @@ def caption_digits_normalizer(dataset):
                 if(word[-1] == "."):
                     val = int(word[:-1])
                 else:
-                    # Check if the word is a float
+                    # Check if the word is a integer
                     val = int(word)
                 # Normalize the value
                 N = val - series_min
                 D = series_max - series_min
-                val_to_substitute = N/D
+                val_to_substitute = int(round(N/D*100))
                 # Substitute the normalized value with the original value in the tokenized caption
                 new_caption = new_caption.replace(str(val), str(round(val_to_substitute, 2)))
             except:

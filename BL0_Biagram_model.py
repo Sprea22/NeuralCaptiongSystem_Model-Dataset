@@ -1,26 +1,34 @@
+import nltk
 import numpy as np
-import pandas as pd
 import random
+import string
 import rouge
+import pandas as pd
+
+import bs4 as bs
+import urllib.request
+import re
 
 def denormalization(input_sequence, input_min, input_max):
-    print(input_sequence)
+    input_sequence = input_sequence[:-1]
+    new_caption = input_sequence
     for word in input_sequence.split(" "):
             try:
                 if(word[-1] == "."):
-                    val = float(word[:-1])
+                    val = int(word[:-1])
                 else:
                     # Check if the word is a float
-                    val = float(word)
+                    val = int(word)
                 # Normalize the value
                 #N = val - input_min
                 #D = input_max - input_min
-                val_to_substitute = (val * (input_max - input_min)) + input_min
+                val_to_substitute = (val/100 * (input_max - input_min)) + input_min
                 # Substitute the normalized value with the original value in the tokenized caption
+                print(val_to_substitute)
                 new_caption = new_caption.replace(str(val), str(round(val_to_substitute, 2)))
             except:
                 pass
-    return input_sequence
+    return new_caption
                   
 def prepare_results(metric, p, r, f):
     return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
@@ -60,29 +68,45 @@ def rouge_evaluation(all_hypothesis, all_references):
                 print(prepare_results(metric, results['p'], results['r'], results['f']))
         print()
 
-def similarity_model(input_sequence, dataset):
-    max_correlated_sentence_value = -2
-    max_correlated_sentence_id = -2
-    
-    list_of_series = dataset.ID_Series.unique()
+def ngram_model(n_grams, article_text, output_sentence_len):
+    ngrams = {}
+    words = n_grams
 
-    for ID_series in list_of_series:
-        temp_dataset = dataset[dataset["ID_Series"] == ID_series]
-        temp_dataset = temp_dataset.reset_index(drop=True)
-        temp_series = temp_dataset.iloc[0, 8:20].values.tolist()
-        temp_corr = np.corrcoef(input_sequence, temp_series)[0][1]
-        if(temp_corr > max_correlated_sentence_value):
-            max_correlated_sentence_id = ID_series
-            max_correlated_sentence_value = temp_corr
+    words_tokens = nltk.word_tokenize(article_text)
+    for i in range(len(words_tokens)-words):
+        seq = ' '.join(words_tokens[i:i+words])
+        if  seq not in ngrams.keys():
+            ngrams[seq] = []
+        ngrams[seq].append(words_tokens[i+words])
 
-    numb_values = len(dataset[dataset["ID_Series"] == max_correlated_sentence_id]["tokenized_caption"].values)
-    r_cap_idx = random.choice(range(0,numb_values))
+    curr_sequence = ' '.join(words_tokens[0:words])
+    output = curr_sequence
 
-    return dataset[dataset["ID_Series"] == max_correlated_sentence_id]["tokenized_caption"].values[r_cap_idx], max_correlated_sentence_id, max_correlated_sentence_value
-# Choose one of the caption from the dataset and give it as output
+    for i in range(output_sentence_len):
+        if curr_sequence not in ngrams.keys():
+            break
+        possible_words = ngrams[curr_sequence]
+        next_word = possible_words[random.randrange(len(possible_words))]
+        output += ' ' + next_word
+        seq_words = nltk.word_tokenize(output)
+        curr_sequence = ' '.join(seq_words[len(seq_words)-words:len(seq_words)])
 
-dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
-dataset_train = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+    print(output)
+    sent_output = output.split(".")[:-1]
+    final_output = ''
+    for sent in sent_output:
+        final_output = final_output + sent + " . "
+
+    return final_output
+
+#dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+
+article_text = ''
+for caption in dataset["tokenized_caption"]:
+    article_text += caption
+
+
 
 orig_captions = []
 orig_tknzed_captions = []
@@ -90,9 +114,16 @@ orig_tknzed_captions = []
 output_captions = []
 output_tknzed_captions = []
 
-IDs = dataset["ID_Series"].values
+#IDs = dataset["ID_Series"].values
+numb_list = list(dataset["ID_Series"].values)
+choosen_list = []
+# Selecting a list of 106 caption idxs for the test split
+for n in range(10):
+    r_num = random.choice(numb_list)
+    choosen_list.append(r_num)
+    numb_list.remove(r_num) 
 
-for idx, seq_index in enumerate(IDs):
+for idx, seq_index in enumerate(choosen_list):
     current_id = dataset.iloc[idx]["ID_Series"]
     current_df = dataset[dataset["ID_Series"] == current_id]
 
@@ -102,13 +133,13 @@ for idx, seq_index in enumerate(IDs):
     dtkn_vocabulary["TKN_Geo"] = current_df["Geo"].values[0] 
     dtkn_vocabulary["TKN_About"] = current_df["About"].values[0] 
     dtkn_vocabulary["TKN_UOM"] = current_df["UOM"].values[0] 
-  
+    
+    #temp_dataset = dataset[dataset["ID_Series"] == seq_index]
     temp_dataset = dataset[dataset["ID_Series"] == seq_index]
     temp_dataset = temp_dataset.reset_index(drop=True)
     temp_series = temp_dataset.iloc[0, 8:20].values.tolist()
     input_sequence = temp_series
-
-    decoded_sentence, max_corr_id, max_corr_val = similarity_model(input_sequence, dataset_train)
+    decoded_sentence = ngram_model(2, article_text, 15)
 
     decoded_dtknzd_sentence = denormalization(decoded_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
 
@@ -117,13 +148,13 @@ for idx, seq_index in enumerate(IDs):
 
     '''
     print('-- #', idx, '------------------------------------------------------------------------------------------------')
-    print("Correlation idx: ", max_corr_id, " with: ", max_corr_val)
     print("Time series data: ", dtkn_vocabulary)
     print("Input values sequence: ", input_sequence)
     print("Output tokenized sequence: ", decoded_sentence)
     print("Output detokenized sequence: ", decoded_dtknzd_sentence)
     print('\n')
     '''
+    
     output_captions.append(decoded_dtknzd_sentence)
     output_tknzed_captions.append(decoded_sentence)
     

@@ -4,7 +4,7 @@ import numpy as np
 v0_captions_collection = pd.read_excel("Captions collection/v0_captions_collection.xlsx")
 data_chart_dataset = pd.read_excel("Data chart images/data_charts_dataset.xlsx")
 
-new_columns_list = ["ID", "ID_Series", "ID_Source", "Year", "Geo", "About", "UOM", "Scalar_Factor", 
+new_columns_list = ["ID", "ID_Caption", "ID_Series", "ID_Source", "Year", "Geo", "About", "UOM", "Scalar_Factor", 
                     "M1_Jan", "M2_Feb", "M3_Mar", "M4_Apr", "M5_May", "M6_Jun", 
                     "M7_Jul", "M8_Aug", "M9_Sep", "M10_Oct", "M11_Nov", "M12_Dec", "caption"]
 
@@ -16,6 +16,7 @@ print("Splitting each caption in subsentences based on the periods..")
 v1_captions_collection = pd.DataFrame(columns = new_columns_list)
 IDs = np.unique(data_chart_dataset["ID_Series"])
 ID_cont = 0
+ID_caption = 0
 
 for ID in IDs:
     temp_ID_captions_dataset = v0_captions_collection[v0_captions_collection["id_caption"] == ID]
@@ -34,7 +35,7 @@ for ID in IDs:
                 pass
 
             sentence = sentence + "."
-            new_instance = [ID_cont, ID, temp_ID_dataset["ID_Source"][0], temp_ID_dataset["Year"][0], temp_ID_dataset["Geo"][0],
+            new_instance = [ID_cont, ID_caption, ID, temp_ID_dataset["ID_Source"][0], temp_ID_dataset["Year"][0], temp_ID_dataset["Geo"][0],
                 temp_ID_dataset["About"][0], temp_ID_dataset["UOM"][0], temp_ID_dataset["Scalar_Factor"][0],
                 temp_ID_dataset["Value"][0], temp_ID_dataset["Value"][1], temp_ID_dataset["Value"][2],
                 temp_ID_dataset["Value"][3], temp_ID_dataset["Value"][4], temp_ID_dataset["Value"][5],
@@ -43,6 +44,7 @@ for ID in IDs:
             new_instance.append(sentence)
             v1_captions_collection.loc[ID_cont] = new_instance
             ID_cont = ID_cont + 1
+        ID_caption = ID_caption + 1
 
 print(" \n The captions have been correctly splitted into subsentences!")
 
@@ -75,5 +77,5 @@ for idx, row in v1_captions_collection.iterrows():
                 new_caption = new_caption.replace(word, new_word)
         except:
             pass
-v1_captions_collection.set_index('ID', inplace=True)
+v1_captions_collection.set_index('ID')
 v1_captions_collection.to_excel("Captions collection/v1_captions_collection.xlsx") 
