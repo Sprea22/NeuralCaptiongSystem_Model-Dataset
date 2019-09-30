@@ -37,7 +37,6 @@ v5_train_captions_collection = normalizer(v4_train_captions_collection)
 v4_test_captions_collection = pd.read_excel("Captions collection/v4_test_captions_collection.xlsx")
 v5_test_captions_collection = normalizer(v4_test_captions_collection)
 
-
 # Normalize the digits within the captions
 def caption_digits_normalizer(dataset):
     for idx, row in dataset.iterrows():
