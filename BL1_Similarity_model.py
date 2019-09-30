@@ -147,21 +147,20 @@ for idx, seq_index in enumerate(choosen_list):
     for tkn in dtkn_vocabulary:
          output_dtknzd_sentence = output_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
-    output_captions.append(output_dtknzd_sentence)
-    orig_captions.append(list(current_df["caption"].values))
+    output_sentences.append(output_dtknzd_sentence)
+    orig_sentences.append(list(current_df["caption"].values))
     #print_results(idx, current_df["caption"].values, output_dtknzd_sentence)
 
 ##################################
 # Generating the output captions #
 ##################################
 for idx, seq_index in enumerate(choosen_list):
-    current_id = dataset.iloc[idx]["ID_Series"]
-    current_df = dataset[dataset["ID_Series"] == current_id]
+    current_df = dataset[dataset["ID_Series"] == seq_index]
     current_captions_idxs = np.unique(current_df["ID_Caption"])
     current_captions = []
-    t_caption = ""
     # Merging sentences back to the original caption
     for temp_id_caption in current_captions_idxs:
+        t_caption = ""
         for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["caption"].values:
             t_caption = t_caption + " " + sentence
         current_captions.append(t_caption)
@@ -188,10 +187,12 @@ print("\n############################")
 print("##### SENTENCE EVALUATION #####")
 print("############################\n")
 # Rouge metric between list of output detokenized sentences and original sentences
-rouge_evaluation(output_captions, orig_captions)
+print(output_sentences[0], orig_sentences[0])
+rouge_evaluation(output_sentences, orig_sentences)
 
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
+print(output_captions[0], orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)

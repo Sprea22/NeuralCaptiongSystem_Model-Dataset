@@ -160,13 +160,12 @@ for idx, seq_index in enumerate(choosen_list):
 # Generating the output captions #
 ##################################
 for idx, seq_index in enumerate(choosen_list):
-    current_id = dataset.iloc[idx]["ID_Series"]
-    current_df = dataset[dataset["ID_Series"] == current_id]
+    current_df = dataset[dataset["ID_Series"] == seq_index]
     current_captions_idxs = np.unique(current_df["ID_Caption"])
     current_captions = []
-    t_caption = ""
     # Merging sentences back to the original caption
     for temp_id_caption in current_captions_idxs:
+        t_caption = ""
         for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["caption"].values:
             t_caption = t_caption + " " + sentence
         current_captions.append(t_caption)
@@ -196,5 +195,6 @@ rouge_evaluation(output_sentences, orig_sentences)
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
+print(output_captions[0], orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)
