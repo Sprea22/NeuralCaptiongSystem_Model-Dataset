@@ -55,6 +55,7 @@ def rouge_evaluation(all_hypothesis, all_references):
     # it's possible to add also 'Individual' to check the evaluation between
     # each single hypothesis and each single reference.
     for aggregator in ['Avg', 'Best']:
+        f1_results = []
         print('Evaluation with {}'.format(aggregator))
         apply_avg = aggregator == 'Avg'
         apply_best = aggregator == 'Best'
@@ -82,8 +83,11 @@ def rouge_evaluation(all_hypothesis, all_references):
                         print('\t' + prepare_results(metric, results_per_ref['p'][reference_id], results_per_ref['r'][reference_id], results_per_ref['f'][reference_id]))
                 print()
             else:
+                temp_f1 = '{:5.2f}'.format(100.0 * results['f'])
+                f1_results.append(temp_f1)
                 print(prepare_results(metric, results['p'], results['r'], results['f']))
-        print()
+        print("F1 Score results: ", [x for x in f1_results], "\n")
+        print("--------------------")
 
 def similarity_model(input_sequence, dataset, mode):
     max_correlated_sentence_value = -2
@@ -118,14 +122,16 @@ def similarity_model(input_sequence, dataset, mode):
 # Initialization # 
 ##################
 
-#dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
-dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+# Selecting a list of 10 random time series  from the train set to evaluate through rouge 
+#dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+#choosen_list = validation_set(dataset, 10)
+
+# Decomment the following rows to execute the evaluation on the test set
+dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
+choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
 output_sentences, output_captions = [], []
-
-# Selecting a list of 10 random time series to evaluate through rouge 
-choosen_list = validation_set(dataset, 10)
 
 ###################################
 # Generating the output sentences #
@@ -186,13 +192,17 @@ for idx, seq_index in enumerate(choosen_list):
 print("\n############################")
 print("##### SENTENCE EVALUATION #####")
 print("############################\n")
+print(output_sentences[0])
+print(orig_sentences[0])
+
+print(output_sentences[1])
+print(orig_sentences[1])
+
 # Rouge metric between list of output detokenized sentences and original sentences
-print(output_sentences[0], orig_sentences[0])
 rouge_evaluation(output_sentences, orig_sentences)
 
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
-print(output_captions[0], orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)

@@ -18,7 +18,7 @@ def format_structure(dataset):
             output_seq =  str(temp_df["tokenized_caption"][index])
             time_series_values = row.iloc[8:20].values
             for value in time_series_values:
-                input_seq = input_seq + str(value) + " "
+                input_seq = input_seq + str(round(value)) + " "
             if(output_seq != "nan"):
                 temp_train_seq = input_seq + "___" + output_seq 
                 captions_list.append(temp_train_seq)
