@@ -198,6 +198,5 @@ rouge_evaluation(output_sentences, orig_sentences)
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
-print(output_captions[0], orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)

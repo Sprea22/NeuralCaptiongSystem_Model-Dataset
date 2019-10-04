@@ -192,12 +192,6 @@ for idx, seq_index in enumerate(choosen_list):
 print("\n############################")
 print("##### SENTENCE EVALUATION #####")
 print("############################\n")
-print(output_sentences[0])
-print(orig_sentences[0])
-
-print(output_sentences[1])
-print(orig_sentences[1])
-
 # Rouge metric between list of output detokenized sentences and original sentences
 rouge_evaluation(output_sentences, orig_sentences)
 
