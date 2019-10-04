@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def new_format_dataset(data):
+def single_caption_format(data):
     v7_new_dataset = data
     v7_new_dataset = v7_new_dataset.iloc[0:0]
 
@@ -61,18 +61,18 @@ def write_text_file(filename, captions_list):
     file.close() 
     
 # New format - Full caption test
-#v5_train_captions_collection = pd.read_excel("Captions collection/v5_train_captions_collection.xlsx")
-#v7_train_captions_collection = new_format_dataset(v5_train_captions_collection)
-#v7_train_captions_collection.to_excel("Captions collection/v7_train_captions_collection.xlsx")
+v5_train_captions_collection = pd.read_excel("Captions collection/v5_train_captions_collection.xlsx")
+v7_train_captions_collection = new_format_dataset(v5_train_captions_collection)
+v7_train_captions_collection.to_excel("Captions collection/v7_train_captions_collection.xlsx")
 
 # New format - Full caption test
 v5_test_captions_collection = pd.read_excel("Captions collection/v5_test_captions_collection.xlsx")
-v7_test_captions_collection = new_format_dataset(v5_test_captions_collection)
+v7_test_captions_collection = single_caption_format(v5_test_captions_collection)
 v7_test_captions_collection.to_excel("Captions collection/v7_test_captions_collection.xlsx")
 
 # Normalization of the time series within the train dataset
 v7_train_captions_collection = pd.read_excel("Captions collection/v7_train_captions_collection.xlsx")
-captions_list = format_structure(v7_train_captions_collection)
+captions_list = single_caption_format(v7_train_captions_collection)
 write_text_file("v7_final_train_captions_collection.txt", captions_list)
 
 # Normalization of the time series within the test dataset
