@@ -28,6 +28,10 @@ def single_caption_format(data):
     return v7_new_dataset
 
 def format_structure(dataset):
+    try:
+        del v7_new_dataset["index"]
+    except:
+        pass
     captions_list = []
     unique_IDs = dataset["ID_Series"].unique()
     unique_IDs = unique_IDs[~np.isnan(unique_IDs)]
@@ -60,22 +64,25 @@ def write_text_file(filename, captions_list):
             print(seq)
     file.close() 
     
+# v7_train_captions_collection = v7_train_captions_collection.reindex(np.random.permutation(v7_train_captions_collection.index))
+ 
 # New format - Full caption test
-v5_train_captions_collection = pd.read_excel("Captions collection/v5_train_captions_collection.xlsx")
-v7_train_captions_collection = new_format_dataset(v5_train_captions_collection)
-v7_train_captions_collection.to_excel("Captions collection/v7_train_captions_collection.xlsx")
+v5_train_captions_collection = pd.read_excel("captions collection/v5_train_captions_collection.xlsx")
+v7_train_captions_collection = single_caption_format(v5_train_captions_collection)
+v7_train_captions_collection.to_excel("captions collection/v7_train_captions_collection.xlsx")
 
 # New format - Full caption test
-v5_test_captions_collection = pd.read_excel("Captions collection/v5_test_captions_collection.xlsx")
+v5_test_captions_collection = pd.read_excel("captions collection/v5_test_captions_collection.xlsx")
 v7_test_captions_collection = single_caption_format(v5_test_captions_collection)
-v7_test_captions_collection.to_excel("Captions collection/v7_test_captions_collection.xlsx")
+v7_test_captions_collection = v7_test_captions_collection.reindex(np.random.permutation(v7_test_captions_collection.index))
+v7_test_captions_collection.to_excel("captions collection/v7_test_captions_collection.xlsx")
 
 # Normalization of the time series within the train dataset
-v7_train_captions_collection = pd.read_excel("Captions collection/v7_train_captions_collection.xlsx")
-captions_list = single_caption_format(v7_train_captions_collection)
+v7_train_captions_collection = pd.read_excel("captions collection/v7_train_captions_collection.xlsx")
+captions_list = format_structure(v7_train_captions_collection)
 write_text_file("v7_final_train_captions_collection.txt", captions_list)
 
 # Normalization of the time series within the test dataset
-v7_test_captions_collection = pd.read_excel("Captions collection/v7_test_captions_collection.xlsx")
+v7_test_captions_collection = pd.read_excel("captions collection/v7_test_captions_collection.xlsx")
 captions_list = format_structure(v7_test_captions_collection)
 write_text_file("v7_final_test_captions_collection.txt", captions_list)

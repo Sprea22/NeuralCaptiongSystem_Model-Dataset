@@ -123,7 +123,7 @@ def similarity_model(input_sequence, dataset, mode):
 ##################
 
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-#dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+train_dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
 #choosen_list = validation_set(dataset, 10)
 
 # Decomment the following rows to execute the evaluation on the test set
@@ -147,7 +147,7 @@ for idx, seq_index in enumerate(choosen_list):
     temp_series = temp_dataset.iloc[0, 9:21].values.tolist()
     input_sequence = temp_series
     # Generating the output sentence
-    output_sentence, max_corr_id, max_corr_val = similarity_model(input_sequence, dataset, "sentence")
+    output_sentence, max_corr_id, max_corr_val = similarity_model(input_sequence, train_dataset, "sentence")
     # Denormalize the output sentence
     output_dtknzd_sentence = denormalization(output_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
     for tkn in dtkn_vocabulary:
@@ -198,5 +198,8 @@ rouge_evaluation(output_sentences, orig_sentences)
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
+
+print(output_captions[0])
+print(orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)

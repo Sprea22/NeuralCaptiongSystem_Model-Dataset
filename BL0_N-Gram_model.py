@@ -125,17 +125,16 @@ def ngram_model(n_grams, article_text, output_sentence_len):
 ##################
 
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-#dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/v7_train_captions_collection.xlsx")
 #choosen_list = validation_set(dataset, 10)
-
-# Decomment the following rows to execute the evaluation on the test set
-dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
-choosen_list = list(dataset["ID_Series"].values)
-
 
 article_text = ''
 for caption in dataset["tokenized_caption"]:
     article_text += caption
+
+# Decomment the following rows to execute the evaluation on the test set
+dataset = pd.read_excel("Dataset/Captions collection/v7_test_captions_collection.xlsx")
+choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
 output_sentences, output_captions = [], []
