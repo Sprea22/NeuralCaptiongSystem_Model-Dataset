@@ -17,30 +17,17 @@ def normalizer(dataset):
     dataset["min_time_series"] = ""
 
     for row_index, row in dataset.iterrows():
-        normalized_time_series, min_input_series, max_input_series = time_series_values_normalizer(row.iloc[9:21].values)
+        normalized_time_series, min_input_series, max_input_series = time_series_values_normalizer(row.iloc[7:19].values)
         for col_index, value in enumerate(normalized_time_series):
-            dataset.iloc[row_index, 8 + col_index] = value
+            dataset.iloc[row_index, 7 + col_index] = value
         dataset.iloc[row_index, dataset.columns.get_loc("min_time_series")] = min_input_series
         dataset.iloc[row_index, dataset.columns.get_loc("max_time_series")] = max_input_series
         
     return dataset
 
-#########################
-# Normalization process #
-#########################
-
-# Normalization of the time series within the train dataset
-v4_train_captions_collection = pd.read_excel("Captions collection/v4_train_captions_collection.xlsx")
-v5_train_captions_collection = normalizer(v4_train_captions_collection)
-
-# Normalization of the time series within the test dataset
-v4_test_captions_collection = pd.read_excel("Captions collection/v4_test_captions_collection.xlsx")
-v5_test_captions_collection = normalizer(v4_test_captions_collection)
-
-# Normalize the digits within the captions
 def caption_digits_normalizer(dataset):
     for idx, row in dataset.iterrows():
-        current_caption = row["tokenized_caption"]
+        current_caption = row["Tokenized_Caption"]
         splitted_caption = current_caption.split(" ")
         new_caption = current_caption
         for word in splitted_caption:
@@ -61,11 +48,17 @@ def caption_digits_normalizer(dataset):
             except:
                 pass
         # Substitute the new tokenized caption in the dataset
-        dataset.iloc[idx, dataset.columns.get_loc("tokenized_caption")] = new_caption
+        dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = new_caption
     return dataset
 
-v5_train_captions_collection = caption_digits_normalizer(v5_train_captions_collection)
-v5_test_captions_collection = caption_digits_normalizer(v5_test_captions_collection)
+#########################
+# Normalization process #
+#########################
 
-v5_train_captions_collection.to_excel("Captions collection/v5_train_captions_collection.xlsx") 
-v5_test_captions_collection.to_excel("Captions collection/v5_test_captions_collection.xlsx") 
+# Normalization of the time series within the dataset
+v2_captions_collection = pd.read_excel("Captions collection/v2_captions_collection.xlsx")
+
+v3_captions_collection = normalizer(v2_captions_collection)
+v3_captions_collection = caption_digits_normalizer(v3_captions_collection)
+
+v3_captions_collection.to_excel("Captions collection/v3_captions_collection.xlsx", index=False) 

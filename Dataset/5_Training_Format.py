@@ -15,8 +15,8 @@ def format_structure(dataset):
             input_seq = input_seq + str(temp_df["UOM"][index]) + "___"
             input_seq = input_seq + str(temp_df["min_time_series"][index]) + "___"
             input_seq = input_seq + str(temp_df["max_time_series"][index]) + "___"
-            output_seq =  str(temp_df["tokenized_caption"][index])
-            time_series_values = row.iloc[8:20].values
+            output_seq =  str(temp_df["Tokenized_Caption"][index])
+            time_series_values = row.iloc[7:19].values
             for value in time_series_values:
                 input_seq = input_seq + str(round(value)) + " "
             if(output_seq != "nan"):
@@ -38,14 +38,19 @@ def write_text_file(filename, captions_list):
 print("\nGenerating the final tokenized and normalized dataset, in a format adapt to the neural model to train.. \n")
 
 # Normalization of the time series within the train dataset
-v5_train_captions_collection = pd.read_excel("Captions collection/v5_train_captions_collection.xlsx")
-captions_list = format_structure(v5_train_captions_collection)
+v3_train_captions_collection = pd.read_excel("Captions collection/v3_train_captions_collection.xlsx")
+captions_list = format_structure(v3_train_captions_collection)
 write_text_file("final_train_captions_collection.txt", captions_list)
 
 # Normalization of the time series within the test dataset
-v5_test_captions_collection = pd.read_excel("Captions collection/v5_test_captions_collection.xlsx")
-captions_list = format_structure(v5_test_captions_collection)
+v3_test_captions_collection = pd.read_excel("Captions collection/v3_test_captions_collection.xlsx")
+captions_list = format_structure(v3_test_captions_collection)
 write_text_file("final_test_captions_collection.txt", captions_list)
+
+# Normalization of the time series within the full dataset
+v3_captions_collection = pd.read_excel("Captions collection/v3_captions_collection.xlsx")
+captions_list = format_structure(v3_captions_collection)
+write_text_file("final_captions_collection.txt", captions_list)
 
 print("Files have been correctly generated! \n")
 

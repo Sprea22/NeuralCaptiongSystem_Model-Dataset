@@ -42,10 +42,10 @@ def find_most_likely_subsentence(about, sentence, mode):
     return max_sentence, max_value
 
 def tokenizer (dataset):
-    dataset["tokenized_caption"] = ""
+    dataset["Tokenized_Caption"] = ""
     for idx, row in dataset.iterrows():
         max_sentence = ""
-        temp_cap = row["caption"]
+        temp_cap = row["Caption"]
         for field in tkn_col_dict:
             temp_cap = temp_cap.replace(str(row[field]), tkn_col_dict[field])
         temp_about = row["About"]
@@ -57,9 +57,9 @@ def tokenizer (dataset):
         max_sentence, max_value = find_most_likely_subsentence(temp_about, temp_cap, "About")
         if(max_sentence != ""):
             new_cap = temp_cap.replace(max_sentence, " TKN_About")
-            dataset.iloc[idx, dataset.columns.get_loc("tokenized_caption")] = new_cap
+            dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = new_cap
         else:
-            dataset.iloc[idx, dataset.columns.get_loc("tokenized_caption")] = temp_cap
+            dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = temp_cap
     return dataset
 
 ########################
@@ -69,12 +69,6 @@ def tokenizer (dataset):
 tkn_col_dict = {"Year" : "TKN_Year", "Geo" : "TKN_Geo", "UOM" : "TKN_UOM"}
 
 # Tokenization of the train dataset
-v3_train_captions_collection = pd.read_excel("Captions collection/v3_train_captions_collection.xlsx")
-v4_train_captions_collection = tokenizer(v3_train_captions_collection)
-
-# Tokenization of the test dataset
-v3_test_captions_collection = pd.read_excel("Captions collection/v3_test_captions_collection.xlsx")
-v4_test_captions_collection = tokenizer(v3_test_captions_collection)
-
-v4_train_captions_collection.to_excel("Captions collection/v4_train_captions_collection.xlsx") 
-v4_test_captions_collection.to_excel("Captions collection/v4_test_captions_collection.xlsx") 
+v1_captions_collection = pd.read_excel("Captions collection/v1_captions_collection.xlsx")
+v2_captions_collection = tokenizer(v1_captions_collection)
+v2_captions_collection.to_excel("Captions collection/v2_captions_collection.xlsx", index=False) 
