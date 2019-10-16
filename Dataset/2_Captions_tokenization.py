@@ -52,11 +52,10 @@ def tokenizer (dataset):
         temp_UOM = row["UOM"]
         max_sentence_UOM, max_value_UOM = find_most_likely_subsentence(temp_UOM, temp_cap, "UOM")
         if(max_sentence_UOM != ""):
-            #print(temp_UOM, " --- ", max_sentence_UOM, " ..... ", max_value_UOM)
-            temp_cap = temp_cap.replace(max_sentence_UOM, " TKN_UOM")
+            temp_cap = temp_cap.replace(max_sentence_UOM, " TKN_UOM ")
         max_sentence, max_value = find_most_likely_subsentence(temp_about, temp_cap, "About")
         if(max_sentence != ""):
-            new_cap = temp_cap.replace(max_sentence, " TKN_About")
+            new_cap = temp_cap.replace(max_sentence, " TKN_About ")
             dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = new_cap
         else:
             dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = temp_cap
@@ -66,7 +65,7 @@ def tokenizer (dataset):
 # Tokenization process #
 ########################
 
-tkn_col_dict = {"Year" : "TKN_Year", "Geo" : "TKN_Geo", "UOM" : "TKN_UOM"}
+tkn_col_dict = {"Year" : " TKN_Year ", "Geo" : " TKN_Geo ", "UOM" : " TKN_UOM "}
 
 # Tokenization of the train dataset
 v1_captions_collection = pd.read_excel("Captions collection/v1_captions_collection.xlsx")

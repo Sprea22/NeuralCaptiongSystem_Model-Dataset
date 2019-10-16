@@ -26,8 +26,8 @@ def captions_retrieval():
         json.dump(captions_collection, write_file)
 
     # Converting the dataframe into a JSON file
-    captions_df = pd.read_json("Captions collection/v0_captions_collection.json").T
-    captions_df.to_excel("Captions collection/v0_captions_collection.xlsx")
+    captions_df = pd.read_json("Captions collection/ROW_v0_captions_collection.json").T
+    captions_df.to_excel("Captions collection/ROW_v0_captions_collection.xlsx")
 
 
 captions_retrieval()

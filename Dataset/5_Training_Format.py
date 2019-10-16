@@ -25,7 +25,7 @@ def format_structure(dataset):
     return captions_list
 
 def write_text_file(filename, captions_list):
-    file = open("0_Final Dataset - Neural Model Input/" + filename, "w", encoding='utf-8') 
+    file = open("Captions collection/" + filename, "w", encoding='utf-8') 
     for seq in captions_list:
         try:
             file.write(seq + "\n")
