@@ -43,11 +43,8 @@ for idx, row in v1_captions_collection.iterrows():
     if(len(current_caption) < 15 or current_caption is None):
         v1_captions_collection = v1_captions_collection.drop(idx)
 
-    # Cast everything to string type
-    new_caption = new_caption.apply(lambda x: str(x))
-
-    # Lower case all the captions
-    new_caption = new_caption.apply(lambda x: x.lower())
+    # Upper to lower case the whole sentence.
+    new_caption = current_caption.lower()
 
     # Check if there are sentences which contain special chars (e.g. \n)
     special_chars_list = ["\n", "\t", u'\u200b']

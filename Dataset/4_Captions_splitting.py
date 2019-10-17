@@ -36,7 +36,7 @@ v3_test_captions_collection.to_excel("Captions collection/v3_test_captions_colle
 v3_train_captions_collection.to_excel("Captions collection/v3_train_captions_collection.xlsx") 
 
 
-# Saving the test and train captions collections
+# Saving the full captions collections in a separate file
 new_final = True
 if(True):
     v3_captions_collection.to_excel("Captions collection/final_captions_collection.xlsx")
