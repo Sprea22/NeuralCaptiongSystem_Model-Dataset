@@ -17,7 +17,9 @@ def find_most_likely_subsentence(about, sentence, mode):
         # Create a subset of each sentence based on the about len.
         for n in [len_about, len_about+1, len_about+2, len_about+3, len_about+4]:
             for idx in range(0, len(words) - n):
-                sub_sentence.append(words[idx : idx+n])
+                n_gram = [x.replace(".", "") for x in words[idx : idx+n]]
+                n_gram = [x.replace(":", "") for x in n_gram]
+                sub_sentence.append(n_gram)
     else:
         # Create a subset of each sentence based on the about len.
         for n in [len_about-1, len_about, len_about+1, len_about+2, len_about+3]:
@@ -28,6 +30,8 @@ def find_most_likely_subsentence(about, sentence, mode):
     # Print out the most similar sentences
     max_sentence = ""
     max_value = 0
+
+    about = about.lower()
     for sub_sen in sub_sentence:
         sub_sen_temp = ""
         for word in sub_sen:

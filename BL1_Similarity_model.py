@@ -112,7 +112,6 @@ def similarity_model(input_sequence, dataset, mode):
         r_cap_idx = random.choice(range(0, len(values)))
         output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
         output_sentence = output_sentence.split(".")[0]
-        print(output_sentence)
 
     return output_sentence, max_correlated_sentence_id, max_correlated_sentence_value
 
