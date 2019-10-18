@@ -4,35 +4,40 @@ def caption_generator(input_seq, mode):
     # Generate empty target sequence of linpth 1.
     target_seq = np.zeros((1,1))
     # Populate the first character of target sequence with the start character.
-    target_seq[0, 0] = target_token_index['CAP_START_']
+    target_sequences = ['CAP_START_']
 
     # Sampling loop for a batch of sequences
     # (to simplify, here we assume a batch of size 1).
-    stop_condition = False
     decoded_caption = ''
     captions_len = 0
-    cont = 0
-    
+    cont = 1
+
     bs_num = 3
 
+    stop_condition = False
+    bs_dictionary = {}
+
     while not stop_condition:
-        # Predicting the probability for the next output tokens
-        output_tokens, h, c = decoder_model.predict([target_seq] + states_value)
-        # Creating a list of tokens ordered by their probability values.
-        indexed = list(enumerate(output_tokens[0, -1, :]))
-        top_values = list(reversed(sorted(indexed, key=operator.itemgetter(1))))
-        top_idxs = [i for i, v in top_values]
-          
-        # Randomness factor force the system to random pick the first word of a caption
-        # within the "randomness factor" most probable words of the list.
-        
-        # Save the token
-        sampled_token_index = [top_idxs[0], top_idxs[1], top_idxs[2]]
-        # Save the probability
-        probabilities_list = [top_values[0], top_values[1], top_values[2]]
-        
-        bs_dictionary[cont] = {"sampled_words" : sampled_token_index, "probabilities" : probabilities_list}
-        
+        target_sequences = []
+        for idx_total_bs in range(1, bs_num + 1):
+            for idx_cur_target, current_target_seq in enumerate(target_sequence):
+                target_seq[0, 0] = target_token_index[current_target_seq]
+                # Predicting the probability for the next output tokens
+                output_tokens, h, c = decoder_model.predict([target_seq] + states_value)
+                # Creating a list of tokens ordered by their probability values.
+                indexed = list(enumerate(output_tokens[0, -1, :]))
+                top_values = list(reversed(sorted(indexed, key=operator.itemgetter(1))))
+                top_idxs = [i for i, v in top_values]
+                
+                # Save the token
+                sampled_token_index = [top_idxs[0], top_idxs[1], top_idxs[2]]
+                # Save the probability
+                probabilities_list = [top_values[0], top_values[1], top_values[2]]
+                bs_dictionary[idx_total_bs] = current_target_seq : {top_values[0] : top_idxs[0], top_values[1] : top_idxs[1], top_values[2] : top_idxs[2]}
+
+            # Set up the next loop.
+            target_sequence = sampled_token_index
+
         max_prob = 0
         max_tokens = []
         for stok_idx, stok_value in enumerate(sampled_token_index):
