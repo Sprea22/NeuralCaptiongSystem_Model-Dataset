@@ -98,23 +98,21 @@ def similarity_model(input_sequence, dataset, mode):
     for ID_series in list_of_series:
         temp_dataset = dataset[dataset["ID_Series"] == ID_series]
         temp_dataset = temp_dataset.reset_index(drop=True)
-        temp_series = temp_dataset.iloc[0, 9:21].values.tolist()
+        temp_series = temp_dataset.iloc[0, 7:19].values.tolist()
         temp_corr = np.corrcoef(input_sequence, temp_series)[0][1]
         if(temp_corr > max_correlated_sentence_value):
             max_correlated_sentence_id = ID_series
             max_correlated_sentence_value = temp_corr
 
-    values = list(dataset[dataset["ID_Series"] == max_correlated_sentence_id]["tokenized_caption"].values)
-    if(mode == "sentence"):
+    values = list(dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values)
+    if(mode == "caption"):
         r_cap_idx = random.choice(range(0, len(values)))
-        output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["tokenized_caption"].values[r_cap_idx]
-    elif(mode == "caption"):
-        output_sentence = ""
-        for n in range(3):
-            r_num = random.choice(range(0, len(values)))
-            choosen_sentence = values[r_num]
-            output_sentence = output_sentence + " " + choosen_sentence
-            values.remove(choosen_sentence) 
+        output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
+    elif(mode == "sentence"):
+        r_cap_idx = random.choice(range(0, len(values)))
+        output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
+        output_sentence = output_sentence.split(".")[0]
+        print(output_sentence)
 
     return output_sentence, max_correlated_sentence_id, max_correlated_sentence_value
 
@@ -123,11 +121,11 @@ def similarity_model(input_sequence, dataset, mode):
 ##################
 
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-train_dataset = pd.read_excel("Dataset/Captions collection/v5_train_captions_collection.xlsx")
+train_dataset = pd.read_excel("Dataset/Captions collection/final_train_captions_collection.xlsx")
 #choosen_list = validation_set(dataset, 10)
 
 # Decomment the following rows to execute the evaluation on the test set
-dataset = pd.read_excel("Dataset/Captions collection/v5_test_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/final_test_captions_collection.xlsx")
 choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
@@ -144,7 +142,7 @@ for idx, seq_index in enumerate(choosen_list):
     # Selecting the time series values
     temp_dataset = dataset[dataset["ID_Series"] == seq_index]
     temp_dataset = temp_dataset.reset_index(drop=True)
-    temp_series = temp_dataset.iloc[0, 9:21].values.tolist()
+    temp_series = temp_dataset.iloc[0, 7:19].values.tolist()
     input_sequence = temp_series
     # Generating the output sentence
     output_sentence, max_corr_id, max_corr_val = similarity_model(input_sequence, train_dataset, "sentence")
@@ -154,8 +152,8 @@ for idx, seq_index in enumerate(choosen_list):
          output_dtknzd_sentence = output_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
     output_sentences.append(output_dtknzd_sentence)
-    orig_sentences.append(list(current_df["caption"].values))
-    #print_results(idx, current_df["caption"].values, output_dtknzd_sentence)
+    orig_sentences.append(list(current_df["Caption"].values))
+    #print_results(idx, current_df["Caption"].values, output_dtknzd_sentence)
 
 ##################################
 # Generating the output captions #
@@ -167,7 +165,7 @@ for idx, seq_index in enumerate(choosen_list):
     # Merging sentences back to the original caption
     for temp_id_caption in current_captions_idxs:
         t_caption = ""
-        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["caption"].values:
+        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["Caption"].values:
             t_caption = t_caption + " " + sentence
         current_captions.append(t_caption)
     # Setting the vocabulary for the current time series

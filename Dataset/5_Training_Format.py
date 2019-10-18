@@ -70,12 +70,12 @@ write_text_file("final_train_captions_collection.txt", captions_list)
 # Normalization of the time series within the test dataset
 v3_test_captions_collection = pd.read_excel("Captions collection/v3_test_captions_collection.xlsx")
 captions_list = format_structure_test(v3_test_captions_collection)
-write_text_file("final_test_captions_collection.txt", captions_list)
+#write_text_file("final_test_captions_collection.txt", captions_list)
 
 # Normalization of the time series within the full dataset
 v3_captions_collection = pd.read_excel("Captions collection/v3_captions_collection.xlsx")
 captions_list = format_structure_test(v3_captions_collection)
-write_text_file("final_captions_collection.txt", captions_list)
+#write_text_file("final_captions_collection.txt", captions_list)
 
 print("Files have been correctly generated! \n")
 

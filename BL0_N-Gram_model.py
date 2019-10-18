@@ -125,15 +125,15 @@ def ngram_model(n_grams, article_text, output_sentence_len):
 ##################
 
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-dataset = pd.read_excel("Dataset/Captions collection/v7_train_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/final_train_captions_collection.xlsx")
 #choosen_list = validation_set(dataset, 10)
 
 article_text = ''
-for caption in dataset["tokenized_caption"]:
+for caption in dataset["Tokenized_Caption"]:
     article_text += caption
 
 # Decomment the following rows to execute the evaluation on the test set
-dataset = pd.read_excel("Dataset/Captions collection/v7_test_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/final_test_captions_collection.xlsx")
 choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
@@ -155,7 +155,7 @@ for idx, seq_index in enumerate(choosen_list):
          output_dtknzd_sentence = output_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
     output_sentences.append(output_dtknzd_sentence)
-    orig_sentences.append(list(current_df["caption"].values))
+    orig_sentences.append(list(current_df["Caption"].values))
     #print_results(idx, input_sequence, output_sentence)
 
 ##################################
@@ -168,7 +168,7 @@ for idx, seq_index in enumerate(choosen_list):
     # Merging sentences back to the original caption
     for temp_id_caption in current_captions_idxs:
         t_caption = ""
-        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["caption"].values:
+        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["Caption"].values:
             t_caption = t_caption + " " + sentence
         current_captions.append(t_caption)
     # Setting the vocabulary for the current time series
