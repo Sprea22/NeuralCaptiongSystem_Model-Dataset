@@ -89,14 +89,14 @@ def rouge_evaluation(all_hypothesis, all_references):
         print("F1 Score results: ", [x for x in f1_results], "\n")
         print("--------------------")
 
-def similarity_model(input_sequence, dataset, mode):
+def similarity_model(input_sequence, train_dataset, mode):
     max_correlated_sentence_value = -2
     max_correlated_sentence_id = -2
     
-    list_of_series = dataset.ID_Series.unique()
+    list_of_series = train_dataset.ID_Series.unique()
 
     for ID_series in list_of_series:
-        temp_dataset = dataset[dataset["ID_Series"] == ID_series]
+        temp_dataset = train_dataset[train_dataset["ID_Series"] == ID_series]
         temp_dataset = temp_dataset.reset_index(drop=True)
         temp_series = temp_dataset.iloc[0, 7:19].values.tolist()
         temp_corr = np.corrcoef(input_sequence, temp_series)[0][1]
@@ -104,13 +104,13 @@ def similarity_model(input_sequence, dataset, mode):
             max_correlated_sentence_id = ID_series
             max_correlated_sentence_value = temp_corr
 
-    values = list(dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values)
+    values = list(train_dataset[train_dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values)
     if(mode == "caption"):
         r_cap_idx = random.choice(range(0, len(values)))
-        output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
+        output_sentence = train_dataset[train_dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
     elif(mode == "sentence"):
         r_cap_idx = random.choice(range(0, len(values)))
-        output_sentence = dataset[dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
+        output_sentence = train_dataset[train_dataset["ID_Series"] == max_correlated_sentence_id]["Tokenized_Caption"].values[r_cap_idx]
         output_sentence = output_sentence.split(".")[0]
 
     return output_sentence, max_correlated_sentence_id, max_correlated_sentence_value
@@ -171,7 +171,7 @@ for idx, seq_index in enumerate(choosen_list):
     dtkn_vocabulary = set_vocabulary(current_df)
 
     # Generating the output sentence
-    output_caption, max_corr_id, max_corr_val = similarity_model(input_sequence, dataset, "caption")
+    output_caption, max_corr_id, max_corr_val = similarity_model(input_sequence, train_dataset, "caption")
 
     # Denormalize the output sentence
     output_dtknzd_caption = denormalization(output_caption, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
