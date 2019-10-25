@@ -151,7 +151,13 @@ for idx, seq_index in enumerate(choosen_list):
          output_dtknzd_sentence = output_dtknzd_sentence.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
     output_sentences.append(output_dtknzd_sentence)
-    orig_sentences.append(list(current_df["Caption"].values))
+
+    # Retrieving the original sentences associated with ID_Seris == idx
+    orig_sent_to_add = []
+    for sentence in list(current_df["Caption"].values):
+      orig_sent_to_add.extend(sentence.split(".")[:-1])
+    orig_sentences.append(orig_sent_to_add)
+
     #print_results(idx, current_df["Caption"].values, output_dtknzd_sentence)
 
 ##################################
@@ -160,13 +166,9 @@ for idx, seq_index in enumerate(choosen_list):
 for idx, seq_index in enumerate(choosen_list):
     current_df = dataset[dataset["ID_Series"] == seq_index]
     current_captions_idxs = np.unique(current_df["ID_Caption"])
-    current_captions = []
-    # Merging sentences back to the original caption
-    for temp_id_caption in current_captions_idxs:
-        t_caption = ""
-        for sentence in current_df[current_df["ID_Caption"] == temp_id_caption]["Caption"].values:
-            t_caption = t_caption + " " + sentence
-        current_captions.append(t_caption)
+    # Retrieving the original captions associated with ID_Seris == idx
+    orig_captions.append(list(current_df["Caption"].values))
+    
     # Setting the vocabulary for the current time series
     dtkn_vocabulary = set_vocabulary(current_df)
 
@@ -179,7 +181,6 @@ for idx, seq_index in enumerate(choosen_list):
          output_dtknzd_caption = output_dtknzd_caption.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
     output_captions.append(output_dtknzd_caption)
-    orig_captions.append(current_captions)
     #print_results(idx, input_sequence, output_sentence)
 
 ### ### ### ### ####
@@ -189,6 +190,8 @@ for idx, seq_index in enumerate(choosen_list):
 print("\n############################")
 print("##### SENTENCE EVALUATION #####")
 print("############################\n")
+print(output_sentences[0])
+print(orig_sentences[0])
 # Rouge metric between list of output detokenized sentences and original sentences
 rouge_evaluation(output_sentences, orig_sentences)
 
