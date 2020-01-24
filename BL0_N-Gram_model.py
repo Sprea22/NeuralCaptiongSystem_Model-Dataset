@@ -53,7 +53,8 @@ def denormalization(input_sequence, input_min, input_max):
     return new_caption
                   
 def prepare_results(metric, p, r, f):
-    return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
+    return str(round(100.0 * p, 2)) + "\t" + str(round(100.0 * r, 2)) + "\t" + str(round(100.0 * f, 2))
+    #return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
 
 def rouge_evaluation(all_hypothesis, all_references):
 
@@ -124,8 +125,10 @@ def ngram_model(n_grams, article_text, output_sentence_len):
 # Initialization # 
 ##################
 
+k_fold_cross_validatin_iter = "5"
+
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-dataset = pd.read_excel("Dataset/Captions collection/final_train_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/5-Fold_Cross_Validation/" + k_fold_cross_validatin_iter + "_train_captions.xlsx")
 #choosen_list = validation_set(dataset, 10)
 
 article_text = ''
@@ -133,7 +136,7 @@ for caption in dataset["Tokenized_Caption"]:
     article_text += caption
 
 # Decomment the following rows to execute the evaluation on the test set
-dataset = pd.read_excel("Dataset/Captions collection/final_test_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/5-Fold_Cross_Validation/" + k_fold_cross_validatin_iter + "_test_captions.xlsx")
 choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
@@ -148,7 +151,7 @@ for idx, seq_index in enumerate(choosen_list):
     # Setting the vocabulary for the current time series
     dtkn_vocabulary = set_vocabulary(current_df)
     # Generating the output sentence
-    output_sentence = ngram_model(2, article_text, 15)
+    output_sentence = ngram_model(2, article_text, 25)
     # Denormalize the output sentence
     output_dtknzd_sentence = denormalization(output_sentence, current_df["min_time_series"].values[0] , current_df["max_time_series"].values[0] )
     for tkn in dtkn_vocabulary:

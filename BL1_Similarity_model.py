@@ -48,7 +48,8 @@ def denormalization(input_sequence, input_min, input_max):
     return new_caption
                   
 def prepare_results(metric, p, r, f):
-    return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
+    return str(round(100.0 * p, 2)) + "\t" + str(round(100.0 * r, 2)) + "\t" + str(round(100.0 * f, 2))
+    #return '\t{}:\t{}: {:5.2f}\t{}: {:5.2f}\t{}: {:5.2f}'.format(metric, 'P', 100.0 * p, 'R', 100.0 * r, 'F1', 100.0 * f)
 
 def rouge_evaluation(all_hypothesis, all_references):
 
@@ -118,13 +119,14 @@ def similarity_model(input_sequence, train_dataset, mode):
 ##################
 # Initialization # 
 ##################
+k_fold_cross_validatin_iter = "5"
 
 # Selecting a list of 10 random time series  from the train set to evaluate through rouge 
-train_dataset = pd.read_excel("Dataset/Captions collection/final_train_captions_collection.xlsx")
+train_dataset = pd.read_excel("Dataset/Captions collection/5-Fold_Cross_Validation/" + k_fold_cross_validatin_iter + "_train_captions.xlsx")
 #choosen_list = validation_set(dataset, 10)
 
 # Decomment the following rows to execute the evaluation on the test set
-dataset = pd.read_excel("Dataset/Captions collection/final_test_captions_collection.xlsx")
+dataset = pd.read_excel("Dataset/Captions collection/5-Fold_Cross_Validation/" + k_fold_cross_validatin_iter + "_test_captions.xlsx")
 choosen_list = list(dataset["ID_Series"].values)
 
 orig_sentences, orig_captions = [], []
@@ -190,16 +192,11 @@ for idx, seq_index in enumerate(choosen_list):
 print("\n############################")
 print("##### SENTENCE EVALUATION #####")
 print("############################\n")
-print(output_sentences[0])
-print(orig_sentences[0])
 # Rouge metric between list of output detokenized sentences and original sentences
 rouge_evaluation(output_sentences, orig_sentences)
 
 print("\n############################")
 print("#### CAPTION EVALUATION ####")
 print("############################\n")
-
-print(output_captions[0])
-print(orig_captions[0])
 # Rouge metric between list of output detokenized captions and original captions
 rouge_evaluation(output_captions, orig_captions)
