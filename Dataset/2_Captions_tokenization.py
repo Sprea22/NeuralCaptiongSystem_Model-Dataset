@@ -51,18 +51,23 @@ def tokenizer (dataset):
         max_sentence = ""
         temp_cap = row["Caption"]
         for field in tkn_col_dict:
-            temp_cap = temp_cap.replace(str(row[field]), tkn_col_dict[field])
+            temp_cap = temp_cap.replace(str(row[field]).lower(), tkn_col_dict[field])
+        
+        # About token
         temp_about = row["About"]
-        temp_UOM = row["UOM"]
-        max_sentence_UOM, max_value_UOM = find_most_likely_subsentence(temp_UOM, temp_cap, "UOM")
-        if(max_sentence_UOM != ""):
-            temp_cap = temp_cap.replace(max_sentence_UOM, " TKN_UOM ")
         max_sentence, max_value = find_most_likely_subsentence(temp_about, temp_cap, "About")
         if(max_sentence != ""):
             new_cap = temp_cap.replace(max_sentence, " TKN_About ")
             dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = new_cap
         else:
             dataset.iloc[idx, dataset.columns.get_loc("Tokenized_Caption")] = temp_cap
+
+        # UOM token
+        temp_UOM = row["UOM"]
+        max_sentence_UOM, max_value_UOM = find_most_likely_subsentence(temp_UOM, temp_cap, "UOM")
+        if(max_sentence_UOM != ""):
+            temp_cap = temp_cap.replace(max_sentence_UOM, " TKN_UOM ")
+
     return dataset
 
 ########################
