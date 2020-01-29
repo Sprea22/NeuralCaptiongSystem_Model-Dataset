@@ -34,7 +34,7 @@ def similarity_model(input_sequence, train_dataset, mode):
 # Initialization # 
 ##################
 
-k_fold_cross_validatin_iter = "5"
+k_fold_cross_validatin_iter = "4"
 
 # CHOICE CAN BE BETWEEN "time_series" OR "captions"
 choice = "time_series"
@@ -109,7 +109,7 @@ for idx, seq_index in enumerate(enumerated_idxs):
     # Append the orig and the output sentences, ready for the evaluation     
     output_captions.append(output_dtknzd_caption)
     
-    #print_results(idx, list(current_df["Caption"].values), output_dtknzd_caption)
+    print_results(seq_index, list(current_df["Caption"].values), output_dtknzd_caption)
 
 ### ### ### ### ####
 # MODEL EVALUATION #

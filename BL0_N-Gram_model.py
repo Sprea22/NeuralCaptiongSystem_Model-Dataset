@@ -43,7 +43,7 @@ def ngram_model(n_grams, article_text, output_sentence_len):
 # Initialization # 
 ##################
 
-k_fold_cross_validatin_iter = "5"
+k_fold_cross_validatin_iter = "4"
 
 # CHOICE CAN BE BETWEEN "time_series" OR "captions"
 choice = "time_series"
@@ -87,7 +87,7 @@ for idx, seq_index in enumerate(enumerated_idxs):
     # Append the orig and the output sentences, ready for the evaluation     
     output_sentences.append(output_dtknzd_sentence)
 
-    #print_results(idx, input_sequence, output_sentence)
+    print_results(seq_index, orig_sent_to_add, output_dtknzd_sentence)
 
 
 ##################################
@@ -112,7 +112,7 @@ for idx, seq_index in enumerate(enumerated_idxs):
          output_dtknzd_caption = output_dtknzd_caption.replace(tkn, dtkn_vocabulary[tkn])
     # Append the orig and the output sentences, ready for the evaluation     
     output_captions.append(output_dtknzd_caption)
-    #print_results(idx, input_sequence, output_sentence)
+    print_results(seq_index, orig_capt_to_add, output_dtknzd_caption)
     
 ### ### ### ### ####
 # MODEL EVALUATION #
