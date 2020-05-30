@@ -11,9 +11,6 @@ df = pd.read_excel(df_dir)
 list_of_series = df.ID_Series.unique()
 list_of_titles = df.About.unique()
 
-print(len(list_of_titles))
-#list_of_series = list_of_series[1:4]
-
 series_list = []
 temp_df = pd.DataFrame()
 
@@ -29,6 +26,15 @@ for ID_series in list_of_series:
 labels_list_of_series = ["series "+ str(s) for s in list_of_series]
 temp_df.columns = labels_list_of_series
 corr_matrix = temp_df.corr()
+
+def average_corr(df):
+    df2 = df.copy()
+    df2.values[np.tril_indices_from(df2)] = np.nan
+    return df2.unstack().mean()
+
+print(corr_matrix)
+x= average_corr(corr_matrix)
+print("Average correlation: ", x)
 
 # Display the correlation matrix between the time series
 fig = plt.figure()
@@ -54,7 +60,7 @@ for lab1 in labels_list_of_series:
     for lab2 in labels_list_of_series[lab_cont : ]:
         if(corr_matrix[lab1][lab2] != 0):
             high_correlation_counter = high_correlation_counter + 1
-            print(lab1 + " & " + lab2 + ": " + str(corr_matrix[lab1][lab2]))
+            #print(lab1 + " & " + lab2 + ": " + str(corr_matrix[lab1][lab2]))
 
 ## 88 couples over 0.9
 ## 53 couples over 0.95
